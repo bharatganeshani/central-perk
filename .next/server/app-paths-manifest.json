@@ -1,0 +1,10 @@
+{
+  "/page": "app/page.js",
+  "/api/candidates/[id]/route": "app/api/candidates/[id]/route.js",
+  "/candidate/upload/page": "app/candidate/upload/page.js",
+  "/api/audit-logs/route": "app/api/audit-logs/route.js",
+  "/candidate/dashboard/page": "app/candidate/dashboard/page.js",
+  "/api/candidates/route": "app/api/candidates/route.js",
+  "/recruiter/dashboard/page": "app/recruiter/dashboard/page.js",
+  "/admin/audit-logs/page": "app/admin/audit-logs/page.js"
+}

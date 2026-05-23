@@ -1,0 +1,2 @@
+Central Perk local storage simulation directory.
+Upload files will resolve to this location in local dev mode.

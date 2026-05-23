@@ -1,0 +1,103 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CANDIDATE
+  RECRUITER
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  VERIFIED
+  FLAGGED
+}
+
+enum DocumentType {
+  RESUME
+  CERTIFICATE
+  PORTFOLIO
+}
+
+enum ReportCategory {
+  AI_DETECTION
+  PLAGIARISM
+  SIGNATURE
+  CONSISTENCY
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String?  // for credentials auth
+  role      Role     @default(CANDIDATE)
+  createdAt DateTime @default(now())
+  
+  profile   CandidateProfile?
+}
+
+model CandidateProfile {
+  id             String          @id @default(uuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName       String
+  headline       String?
+  avatarUrl      String?
+  trustScore     Int             @default(0)
+  status         Status          @default(PENDING)
+  createdAt      DateTime        @default(now())
+  
+  documents      Document[]
+  trustBreakdown TrustBreakdown?
+}
+
+model Document {
+  id          String               @id @default(uuid())
+  candidateId String
+  candidate   CandidateProfile     @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  type        DocumentType
+  fileUrl     String
+  fileName    String
+  uploadedAt  DateTime             @default(now())
+  
+  reports     VerificationReport[]
+}
+
+model VerificationReport {
+  id         String         @id @default(uuid())
+  documentId String
+  document   Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  category   ReportCategory
+  score      Int            @default(0) // 0-100
+  flags      String         // JSON string array of flags
+  summary    String
+  analyzedAt DateTime       @default(now())
+}
+
+model TrustBreakdown {
+  id               String           @id @default(uuid())
+  candidateId      String           @unique
+  candidate        CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  resumeScore      Int              @default(0)
+  certificateScore Int              @default(0)
+  portfolioScore   Int              @default(0)
+  finalScore       Int              @default(0)
+  lastUpdated      DateTime         @default(now()) @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String
+  action     String
+  targetId   String
+  targetType String
+  timestamp  DateTime @default(now())
+  metadata   String?  // JSON string
+}
