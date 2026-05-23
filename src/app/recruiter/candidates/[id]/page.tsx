@@ -77,7 +77,15 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
     doc.reports.forEach((rep: any) => {
       rep.flags.forEach((fStr: string) => {
         try {
-          allFlags.push({ ...JSON.parse(fStr), docType: doc.type });
+          allFlags.push({
+            ...JSON.parse(fStr),
+            docType: doc.type,
+            docFileName: doc.fileName,
+            docFileUrl: doc.fileUrl,
+            reportCategory: rep.category,
+            reportScore: rep.score,
+            reportSummary: rep.summary
+          });
         } catch {}
       });
     });

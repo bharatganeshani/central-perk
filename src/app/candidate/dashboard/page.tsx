@@ -60,13 +60,6 @@ export default function CandidateDashboard() {
     };
   }, [candidateId, tick]);
 
-  const handleCandidateChange = (id: string) => {
-    localStorage.setItem('candidatePortalId', id);
-    setCandidateId(id);
-    setLoading(true);
-    setCandidate(null);
-  };
-
   const getTimelineStatus = (stepName: string) => {
     if (!candidate) return 'WAITING';
     if (candidate.status !== 'PENDING') return 'COMPLETED';
@@ -105,30 +98,6 @@ export default function CandidateDashboard() {
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 mt-8 space-y-8">
-        
-        {/* Profile Switcher & Info */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-slate-900/50 border border-slate-800 rounded-xl gap-4">
-          <div>
-            <h2 className="text-sm font-mono text-slate-400 uppercase tracking-widest">Candidate clearance monitor</h2>
-            <p className="text-xs text-slate-500 mt-1">Select a candidate to view reports or upload a new candidate via headers.</p>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <label className="text-xs font-mono text-slate-400">ACTIVE CANDIDATE PROFILE:</label>
-            <select
-              value={candidateId}
-              onChange={(e) => handleCandidateChange(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs font-mono text-primary focus:outline-none"
-            >
-              <option value="candidate-1">Sarah Jenkins (Verified - 95)</option>
-              <option value="candidate-2">Alex Mercer (AI Resume - 42)</option>
-              <option value="candidate-3">Michael Chang (Forged AWS - 58)</option>
-              <option value="candidate-4">Elena Rostova (Plagiarized Portfolio - 35)</option>
-              <option value="candidate-5">David Kim (Finance Transitioner - 75)</option>
-            </select>
-          </div>
-        </div>
-
         {loading && !candidate ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <RefreshCw className="w-8 h-8 text-primary animate-spin" />
@@ -353,7 +322,15 @@ export default function CandidateDashboard() {
                         doc.reports.forEach((rep: any) => {
                           rep.flags.forEach((fStr: string) => {
                             try {
-                              allFlags.push({ ...JSON.parse(fStr), docType: doc.type });
+                              allFlags.push({
+                                ...JSON.parse(fStr),
+                                docType: doc.type,
+                                docFileName: doc.fileName,
+                                docFileUrl: doc.fileUrl,
+                                reportCategory: rep.category,
+                                reportScore: rep.score,
+                                reportSummary: rep.summary
+                              });
                             } catch {}
                           });
                         });

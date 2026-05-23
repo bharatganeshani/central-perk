@@ -1,4 +1,4 @@
-// File: C:\Users\bhara\OneDrive\Documents\code stuff\rvcc\central-perk\src\app\candidate\upload\page.tsx
+// File: D:\central-perk\src\app\candidate\upload\page.tsx
 import * as entry from '../../../../../src/app/candidate/upload/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

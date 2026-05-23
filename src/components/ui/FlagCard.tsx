@@ -9,11 +9,21 @@ interface FlagCardProps {
     severity: 'info' | 'warning' | 'critical';
     excerpt: string;
     explanation: string;
+    docType?: string;
+    docFileName?: string;
+    docFileUrl?: string;
+    reportCategory?: string;
+    reportScore?: number;
+    reportSummary?: string;
   };
 }
 
 export default function FlagCard({ flag }: FlagCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const encodedUrl = flag.docFileUrl ? encodeURI(flag.docFileUrl) : '';
+  const isExternalUrl = encodedUrl.startsWith('http');
+  const hasDocContext = Boolean(flag.docType || flag.docFileName || flag.docFileUrl);
+  const hasReportContext = Boolean(flag.reportCategory || flag.reportScore !== undefined || flag.reportSummary);
 
   const styles = {
     critical: {
@@ -74,12 +84,62 @@ export default function FlagCard({ flag }: FlagCardProps) {
       {isOpen && (
         <div className="px-4 pb-4 pt-1 border-t border-slate-800 bg-slate-950/40">
           <div className="space-y-3 font-sans text-sm">
+            {hasDocContext && (
+              <div>
+                <span className="text-xs font-mono text-slate-500 uppercase tracking-widest block mb-1">Document Context</span>
+                <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono text-xs break-words space-y-2">
+                  {flag.docType && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Type</span>
+                      <span>{flag.docType}</span>
+                    </div>
+                  )}
+                  {flag.docFileName && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">File</span>
+                      <span className="text-slate-200 truncate max-w-[220px] sm:max-w-[280px]" title={flag.docFileName}>{flag.docFileName}</span>
+                    </div>
+                  )}
+                  {encodedUrl && (
+                    <div>
+                      <span className="text-slate-500 block">Source</span>
+                      <a
+                        href={encodedUrl}
+                        target={isExternalUrl ? '_blank' : undefined}
+                        rel={isExternalUrl ? 'noreferrer' : undefined}
+                        className="text-primary hover:underline break-words"
+                      >
+                        {encodedUrl}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             <div>
               <span className="text-xs font-mono text-slate-500 uppercase tracking-widest block mb-1">Affected Segment</span>
               <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono text-xs break-words border-l-2 border-l-primary">
                 "{flag.excerpt}"
               </div>
             </div>
+            {hasReportContext && (
+              <div>
+                <span className="text-xs font-mono text-slate-500 uppercase tracking-widest block mb-1">Verification Report</span>
+                <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-slate-300 text-xs space-y-2">
+                  {(flag.reportCategory || flag.reportScore !== undefined) && (
+                    <div className="flex items-center justify-between font-mono">
+                      <span className="text-slate-500 uppercase tracking-widest text-[10px]">{flag.reportCategory || 'REPORT'}</span>
+                      {flag.reportScore !== undefined && (
+                        <span className="text-slate-200">{flag.reportScore}/100</span>
+                      )}
+                    </div>
+                  )}
+                  {flag.reportSummary && (
+                    <p className="text-slate-400 leading-relaxed">{flag.reportSummary}</p>
+                  )}
+                </div>
+              </div>
+            )}
             <div>
               <span className="text-xs font-mono text-slate-500 uppercase tracking-widest block mb-1">Intelligence Assessment</span>
               <p className="text-slate-300 leading-relaxed text-xs">
