@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { supabaseAdmin } from './supabase';
 
-// Interface for type safety
+// Interfaces for type safety
 export interface UserData {
   id: string;
   email: string;
@@ -36,7 +37,7 @@ export interface VerificationReportData {
   documentId: string;
   category: 'AI_DETECTION' | 'PLAGIARISM' | 'SIGNATURE' | 'CONSISTENCY';
   score: number;
-  flags: string[]; // parsed from JSON array
+  flags: string[]; // parsed JSON string array
   summary: string;
   analyzedAt: string;
 }
@@ -61,10 +62,9 @@ export interface AuditLogData {
   metadata: string; // JSON string
 }
 
-// Local File Database path (within workspace for persistence)
+// Local File Database path (within workspace for persistence fallback)
 const DB_FILE = path.join(process.cwd(), 'src', 'lib', 'mockDb.json');
 
-// Memory cache for local database
 let localDbCache: {
   users: UserData[];
   candidates: CandidateProfileData[];
@@ -74,11 +74,9 @@ let localDbCache: {
   logs: AuditLogData[];
 } | null = null;
 
-// Initialize or read the local database
 function readLocalDb() {
   if (localDbCache) return localDbCache;
 
-  // Make sure directory exists
   const dir = path.dirname(DB_FILE);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -94,7 +92,6 @@ function readLocalDb() {
     }
   }
 
-  // Set default structure
   localDbCache = {
     users: [],
     candidates: [],
@@ -116,24 +113,158 @@ function writeLocalDb() {
   fs.writeFileSync(DB_FILE, JSON.stringify(localDbCache, null, 2), 'utf-8');
 }
 
-// Try initializing Prisma
-let prisma: any = null;
-let usePrisma = false;
+// Check Supabase activation credentials
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-if (process.env.DATABASE_URL) {
-  try {
-    const { PrismaClient } = require('@prisma/client');
-    prisma = new PrismaClient();
-    usePrisma = true;
-    console.log('Prisma Client initialized with DATABASE_URL.');
-  } catch (e) {
-    console.warn('Prisma package/client not ready. Defaulting to local JSON database.');
-  }
+if (useSupabase) {
+  console.log('Supabase Connection established as DB provider.');
 } else {
-  console.log('No DATABASE_URL found in environment. Defaulting to local JSON database.');
+  console.log('No Supabase credentials found in environment. Defaulting to local JSON database.');
 }
 
-// Exported Database Interface (DAO)
+// Converters: DB (snake_case) <-> JS (camelCase)
+function toJsUser(u: any): UserData {
+  return {
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    createdAt: u.created_at,
+    password: u.password
+  };
+}
+
+function toDbUser(u: UserData) {
+  return {
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    password: u.password,
+    created_at: u.createdAt
+  };
+}
+
+function toJsCandidate(c: any): CandidateProfileData {
+  return {
+    id: c.id,
+    userId: c.user_id,
+    fullName: c.full_name,
+    headline: c.headline,
+    avatarUrl: c.avatar_url,
+    trustScore: c.trust_score,
+    status: c.status,
+    createdAt: c.created_at
+  };
+}
+
+function toDbCandidate(c: CandidateProfileData) {
+  return {
+    id: c.id,
+    user_id: c.userId,
+    full_name: c.fullName,
+    headline: c.headline,
+    avatar_url: c.avatarUrl,
+    trust_score: c.trustScore,
+    status: c.status,
+    created_at: c.createdAt
+  };
+}
+
+function toJsDocument(d: any): DocumentData {
+  return {
+    id: d.id,
+    candidateId: d.candidate_id,
+    type: d.type,
+    fileUrl: d.file_url,
+    fileName: d.file_name,
+    uploadedAt: d.uploaded_at
+  };
+}
+
+function toDbDocument(d: DocumentData) {
+  return {
+    id: d.id,
+    candidate_id: d.candidateId,
+    type: d.type,
+    file_url: d.fileUrl,
+    file_name: d.fileName,
+    uploaded_at: d.uploadedAt
+  };
+}
+
+function toJsReport(r: any): VerificationReportData {
+  return {
+    id: r.id,
+    documentId: r.document_id,
+    category: r.category,
+    score: r.score,
+    flags: typeof r.flags === 'string' ? JSON.parse(r.flags) : (Array.isArray(r.flags) ? r.flags : []),
+    summary: r.summary,
+    analyzedAt: r.analyzed_at
+  };
+}
+
+function toDbReport(r: VerificationReportData) {
+  return {
+    id: r.id,
+    document_id: r.documentId,
+    category: r.category,
+    score: r.score,
+    flags: JSON.stringify(r.flags),
+    summary: r.summary,
+    analyzed_at: r.analyzedAt
+  };
+}
+
+function toJsBreakdown(b: any): TrustBreakdownData {
+  return {
+    id: b.id,
+    candidateId: b.candidate_id,
+    resumeScore: b.resume_score,
+    certificateScore: b.certificate_score,
+    portfolioScore: b.portfolio_score,
+    finalScore: b.final_score,
+    lastUpdated: b.last_updated
+  };
+}
+
+function toDbBreakdown(b: TrustBreakdownData) {
+  return {
+    id: b.id,
+    candidate_id: b.candidateId,
+    resume_score: b.resumeScore,
+    certificate_score: b.certificateScore,
+    portfolio_score: b.portfolioScore,
+    final_score: b.finalScore,
+    last_updated: b.lastUpdated
+  };
+}
+
+function toJsAuditLog(l: any): AuditLogData {
+  return {
+    id: l.id,
+    actorId: l.actor_id,
+    action: l.action,
+    targetId: l.target_id,
+    targetType: l.target_type,
+    timestamp: l.timestamp,
+    metadata: l.metadata
+  };
+}
+
+function toDbAuditLog(l: AuditLogData) {
+  return {
+    id: l.id,
+    actor_id: l.actorId,
+    action: l.action,
+    target_id: l.targetId,
+    target_type: l.targetType,
+    timestamp: l.timestamp,
+    metadata: l.metadata
+  };
+}
+
 export const db = {
   // Reset and Seed DB
   async resetAndSeed(seedData: {
@@ -144,92 +275,32 @@ export const db = {
     breakdowns: TrustBreakdownData[];
     logs: AuditLogData[];
   }) {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        await prisma.auditLog.deleteMany({});
-        await prisma.trustBreakdown.deleteMany({});
-        await prisma.verificationReport.deleteMany({});
-        await prisma.document.deleteMany({});
-        await prisma.candidateProfile.deleteMany({});
-        await prisma.user.deleteMany({});
+        // Clear all (order matters for foreign keys)
+        await supabaseAdmin.from('audit_logs').delete().neq('id', '0');
+        await supabaseAdmin.from('trust_breakdowns').delete().neq('id', '0');
+        await supabaseAdmin.from('verification_reports').delete().neq('id', '0');
+        await supabaseAdmin.from('documents').delete().neq('id', '0');
+        await supabaseAdmin.from('candidate_profiles').delete().neq('id', '0');
+        await supabaseAdmin.from('users').delete().neq('id', '0');
 
-        // Create Users
-        for (const u of seedData.users) {
-          await prisma.user.create({
-            data: { id: u.id, email: u.email, name: u.name, role: u.role, password: u.password, createdAt: new Date(u.createdAt) }
-          });
-        }
-        // Create Profiles
-        for (const c of seedData.candidates) {
-          await prisma.candidateProfile.create({
-            data: {
-              id: c.id,
-              userId: c.userId,
-              fullName: c.fullName,
-              headline: c.headline,
-              avatarUrl: c.avatarUrl,
-              trustScore: c.trustScore,
-              status: c.status,
-              createdAt: new Date(c.createdAt)
-            }
-          });
-        }
-        // Create Documents
-        for (const d of seedData.documents) {
-          await prisma.document.create({
-            data: { id: d.id, candidateId: d.candidateId, type: d.type, fileUrl: d.fileUrl, fileName: d.fileName, uploadedAt: new Date(d.uploadedAt) }
-          });
-        }
-        // Create Reports
-        for (const r of seedData.reports) {
-          await prisma.verificationReport.create({
-            data: {
-              id: r.id,
-              documentId: r.documentId,
-              category: r.category,
-              score: r.score,
-              flags: JSON.stringify(r.flags),
-              summary: r.summary,
-              analyzedAt: new Date(r.analyzedAt)
-            }
-          });
-        }
-        // Create Breakdowns
-        for (const b of seedData.breakdowns) {
-          await prisma.trustBreakdown.create({
-            data: {
-              id: b.id,
-              candidateId: b.candidateId,
-              resumeScore: b.resumeScore,
-              certificateScore: b.certificateScore,
-              portfolioScore: b.portfolioScore,
-              finalScore: b.finalScore,
-              lastUpdated: new Date(b.lastUpdated)
-            }
-          });
-        }
-        // Create Logs
-        for (const l of seedData.logs) {
-          await prisma.auditLog.create({
-            data: {
-              id: l.id,
-              actorId: l.actorId,
-              action: l.action,
-              targetId: l.targetId,
-              targetType: l.targetType,
-              timestamp: new Date(l.timestamp),
-              metadata: l.metadata
-            }
-          });
-        }
-        console.log('Seeded database via Prisma.');
+        // Insert seed tables
+        await supabaseAdmin.from('users').insert(seedData.users.map(toDbUser));
+        await supabaseAdmin.from('candidate_profiles').insert(seedData.candidates.map(toDbCandidate));
+        await supabaseAdmin.from('documents').insert(seedData.documents.map(toDbDocument));
+        await supabaseAdmin.from('verification_reports').insert(seedData.reports.map(toDbReport));
+        await supabaseAdmin.from('trust_breakdowns').insert(seedData.breakdowns.map(toDbBreakdown));
+        await supabaseAdmin.from('audit_logs').insert(seedData.logs.map(toDbAuditLog));
+        
+        console.log('Seeded database via Supabase client.');
         return;
       } catch (err) {
-        console.error('Prisma seeding failed, falling back to local storage', err);
+        console.error('Supabase seeding failed, falling back to local storage', err);
       }
     }
 
-    // JSON file database implementation
+    // fallback local storage
     localDbCache = {
       users: [...seedData.users],
       candidates: [...seedData.candidates],
@@ -244,12 +315,13 @@ export const db = {
 
   // Users
   async getUsers(): Promise<UserData[]> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const u = await prisma.user.findMany();
-        return u.map((x: any) => ({ ...x, createdAt: x.createdAt.toISOString() }));
+        const { data, error } = await supabaseAdmin.from('users').select('*');
+        if (error) throw error;
+        return data.map(toJsUser);
       } catch (e) {
-        console.error('Prisma getUsers error, falling back to local JSON.', e);
+        console.error('Supabase getUsers error, falling back.', e);
       }
     }
     const dbData = readLocalDb();
@@ -257,13 +329,14 @@ export const db = {
   },
 
   async getUserByEmail(email: string): Promise<UserData | null> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const u = await prisma.user.findUnique({ where: { email } });
-        if (u) return { ...u, createdAt: u.createdAt.toISOString() };
+        const { data, error } = await supabaseAdmin.from('users').select('*').eq('email', email).maybeSingle();
+        if (error) throw error;
+        if (data) return toJsUser(data);
         return null;
       } catch (e) {
-        console.error('Prisma getUserByEmail error, falling back to local JSON.', e);
+        console.error('Supabase getUserByEmail error, falling back.', e);
       }
     }
     const dbData = readLocalDb();
@@ -271,13 +344,14 @@ export const db = {
   },
 
   async getUserById(id: string): Promise<UserData | null> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const u = await prisma.user.findUnique({ where: { id } });
-        if (u) return { ...u, createdAt: u.createdAt.toISOString() };
+        const { data, error } = await supabaseAdmin.from('users').select('*').eq('id', id).maybeSingle();
+        if (error) throw error;
+        if (data) return toJsUser(data);
         return null;
       } catch (e) {
-        console.error('Prisma getUserById error, falling back.', e);
+        console.error('Supabase getUserById error, falling back.', e);
       }
     }
     const dbData = readLocalDb();
@@ -291,21 +365,13 @@ export const db = {
       ...data
     };
 
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const u = await prisma.user.create({
-          data: {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-            role: newUser.role,
-            password: newUser.password,
-            createdAt: new Date(newUser.createdAt)
-          }
-        });
-        return { ...u, createdAt: u.createdAt.toISOString() };
+        const { data: inserted, error } = await supabaseAdmin.from('users').insert(toDbUser(newUser)).select().single();
+        if (error) throw error;
+        return toJsUser(inserted);
       } catch (e) {
-        console.error('Prisma createUser error, falling back.', e);
+        console.error('Supabase createUser error, falling back.', e);
       }
     }
 
@@ -317,42 +383,26 @@ export const db = {
 
   // Candidates
   async getCandidates(): Promise<(CandidateProfileData & { user: UserData; trustBreakdown?: TrustBreakdownData })[]> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const list = await prisma.candidateProfile.findMany({
-          include: {
-            user: true,
-            trustBreakdown: true
-          }
+        // Query details and relations
+        const { data, error } = await supabaseAdmin
+          .from('candidate_profiles')
+          .select('*, users(*), trust_breakdowns(*)');
+        
+        if (error) throw error;
+        
+        return data.map((c: any) => {
+          const user = c.users ? toJsUser(c.users) : { id: c.user_id, email: '', name: c.full_name, role: 'CANDIDATE' as const, createdAt: '' };
+          const trustBreakdown = c.trust_breakdowns ? toJsBreakdown(c.trust_breakdowns) : undefined;
+          return {
+            ...toJsCandidate(c),
+            user,
+            trustBreakdown
+          };
         });
-        return list.map((c: any) => ({
-          id: c.id,
-          userId: c.userId,
-          fullName: c.fullName,
-          headline: c.headline,
-          avatarUrl: c.avatarUrl,
-          trustScore: c.trustScore,
-          status: c.status,
-          createdAt: c.createdAt.toISOString(),
-          user: {
-            id: c.user.id,
-            email: c.user.email,
-            name: c.user.name,
-            role: c.user.role,
-            createdAt: c.user.createdAt.toISOString()
-          },
-          trustBreakdown: c.trustBreakdown ? {
-            id: c.trustBreakdown.id,
-            candidateId: c.trustBreakdown.candidateId,
-            resumeScore: c.trustBreakdown.resumeScore,
-            certificateScore: c.trustBreakdown.certificateScore,
-            portfolioScore: c.trustBreakdown.portfolioScore,
-            finalScore: c.trustBreakdown.finalScore,
-            lastUpdated: c.trustBreakdown.lastUpdated.toISOString()
-          } : undefined
-        }));
       } catch (e) {
-        console.error('Prisma getCandidates error, falling back.', e);
+        console.error('Supabase getCandidates error, falling back.', e);
       }
     }
 
@@ -369,66 +419,37 @@ export const db = {
   },
 
   async getCandidateById(id: string): Promise<(CandidateProfileData & { user: UserData; trustBreakdown?: TrustBreakdownData; documents: (DocumentData & { reports: VerificationReportData[] })[] }) | null> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const c = await prisma.candidateProfile.findUnique({
-          where: { id },
-          include: {
-            user: true,
-            trustBreakdown: true,
-            documents: {
-              include: {
-                reports: true
-              }
-            }
-          }
-        });
+        // Get relations
+        const { data: c, error } = await supabaseAdmin
+          .from('candidate_profiles')
+          .select('*, users(*), trust_breakdowns(*), documents(*, verification_reports(*))')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error) throw error;
         if (!c) return null;
+
+        const user = c.users ? toJsUser(c.users) : { id: c.user_id, email: '', name: c.full_name, role: 'CANDIDATE' as const, createdAt: '' };
+        const trustBreakdown = c.trust_breakdowns ? toJsBreakdown(c.trust_breakdowns) : undefined;
+        
+        const documents = (c.documents || []).map((d: any) => {
+          const reports = (d.verification_reports || []).map(toJsReport);
+          return {
+            ...toJsDocument(d),
+            reports
+          };
+        });
+
         return {
-          id: c.id,
-          userId: c.userId,
-          fullName: c.fullName,
-          headline: c.headline,
-          avatarUrl: c.avatarUrl,
-          trustScore: c.trustScore,
-          status: c.status,
-          createdAt: c.createdAt.toISOString(),
-          user: {
-            id: c.user.id,
-            email: c.user.email,
-            name: c.user.name,
-            role: c.user.role,
-            createdAt: c.user.createdAt.toISOString()
-          },
-          trustBreakdown: c.trustBreakdown ? {
-            id: c.trustBreakdown.id,
-            candidateId: c.trustBreakdown.candidateId,
-            resumeScore: c.trustBreakdown.resumeScore,
-            certificateScore: c.trustBreakdown.certificateScore,
-            portfolioScore: c.trustBreakdown.portfolioScore,
-            finalScore: c.trustBreakdown.finalScore,
-            lastUpdated: c.trustBreakdown.lastUpdated.toISOString()
-          } : undefined,
-          documents: c.documents.map((d: any) => ({
-            id: d.id,
-            candidateId: d.candidateId,
-            type: d.type,
-            fileUrl: d.fileUrl,
-            fileName: d.fileName,
-            uploadedAt: d.uploadedAt.toISOString(),
-            reports: d.reports.map((r: any) => ({
-              id: r.id,
-              documentId: r.documentId,
-              category: r.category,
-              score: r.score,
-              flags: JSON.parse(r.flags),
-              summary: r.summary,
-              analyzedAt: r.analyzedAt.toISOString()
-            }))
-          }))
+          ...toJsCandidate(c),
+          user,
+          trustBreakdown,
+          documents
         };
       } catch (e) {
-        console.error('Prisma getCandidateById error, falling back.', e);
+        console.error('Supabase getCandidateById error, falling back.', e);
       }
     }
 
@@ -457,34 +478,24 @@ export const db = {
   },
 
   async getCandidateByUserId(userId: string): Promise<(CandidateProfileData & { trustBreakdown?: TrustBreakdownData }) | null> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const c = await prisma.candidateProfile.findUnique({
-          where: { userId },
-          include: { trustBreakdown: true }
-        });
+        const { data: c, error } = await supabaseAdmin
+          .from('candidate_profiles')
+          .select('*, trust_breakdowns(*)')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (error) throw error;
         if (!c) return null;
+
+        const trustBreakdown = c.trust_breakdowns ? toJsBreakdown(c.trust_breakdowns) : undefined;
         return {
-          id: c.id,
-          userId: c.userId,
-          fullName: c.fullName,
-          headline: c.headline,
-          avatarUrl: c.avatarUrl,
-          trustScore: c.trustScore,
-          status: c.status,
-          createdAt: c.createdAt.toISOString(),
-          trustBreakdown: c.trustBreakdown ? {
-            id: c.trustBreakdown.id,
-            candidateId: c.trustBreakdown.candidateId,
-            resumeScore: c.trustBreakdown.resumeScore,
-            certificateScore: c.trustBreakdown.certificateScore,
-            portfolioScore: c.trustBreakdown.portfolioScore,
-            finalScore: c.trustBreakdown.finalScore,
-            lastUpdated: c.trustBreakdown.lastUpdated.toISOString()
-          } : undefined
+          ...toJsCandidate(c),
+          trustBreakdown
         };
       } catch (e) {
-        console.error('Prisma getCandidateByUserId error, falling back.', e);
+        console.error('Supabase getCandidateByUserId error, falling back.', e);
       }
     }
     const dbData = readLocalDb();
@@ -503,23 +514,13 @@ export const db = {
       ...data
     };
 
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const c = await prisma.candidateProfile.create({
-          data: {
-            id: newProfile.id,
-            userId: newProfile.userId,
-            fullName: newProfile.fullName,
-            headline: newProfile.headline,
-            avatarUrl: newProfile.avatarUrl,
-            trustScore: newProfile.trustScore,
-            status: newProfile.status,
-            createdAt: new Date(newProfile.createdAt)
-          }
-        });
-        return { ...c, createdAt: c.createdAt.toISOString() };
+        const { data: inserted, error } = await supabaseAdmin.from('candidate_profiles').insert(toDbCandidate(newProfile)).select().single();
+        if (error) throw error;
+        return toJsCandidate(inserted);
       } catch (e) {
-        console.error('Prisma createCandidateProfile error, falling back.', e);
+        console.error('Supabase createCandidateProfile error, falling back.', e);
       }
     }
 
@@ -530,19 +531,26 @@ export const db = {
   },
 
   async updateCandidateProfile(id: string, data: Partial<CandidateProfileData>): Promise<CandidateProfileData> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const c = await prisma.candidateProfile.update({
-          where: { id },
-          data: {
-            ...data,
-            // Convert strings back to Enums/Dates
-            status: data.status,
-          }
-        });
-        return { ...c, createdAt: c.createdAt.toISOString() };
+        const dbUpdateData: any = {};
+        if (data.fullName !== undefined) dbUpdateData.full_name = data.fullName;
+        if (data.headline !== undefined) dbUpdateData.headline = data.headline;
+        if (data.avatarUrl !== undefined) dbUpdateData.avatar_url = data.avatarUrl;
+        if (data.trustScore !== undefined) dbUpdateData.trust_score = data.trustScore;
+        if (data.status !== undefined) dbUpdateData.status = data.status;
+
+        const { data: updated, error } = await supabaseAdmin
+          .from('candidate_profiles')
+          .update(dbUpdateData)
+          .eq('id', id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return toJsCandidate(updated);
       } catch (e) {
-        console.error('Prisma updateCandidateProfile error, falling back.', e);
+        console.error('Supabase updateCandidateProfile error, falling back.', e);
       }
     }
 
@@ -566,21 +574,13 @@ export const db = {
       ...data
     };
 
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const d = await prisma.document.create({
-          data: {
-            id: newDoc.id,
-            candidateId: newDoc.candidateId,
-            type: newDoc.type,
-            fileUrl: newDoc.fileUrl,
-            fileName: newDoc.fileName,
-            uploadedAt: new Date(newDoc.uploadedAt)
-          }
-        });
-        return { ...d, uploadedAt: d.uploadedAt.toISOString() };
+        const { data: inserted, error } = await supabaseAdmin.from('documents').insert(toDbDocument(newDoc)).select().single();
+        if (error) throw error;
+        return toJsDocument(inserted);
       } catch (e) {
-        console.error('Prisma createDocument error, falling back.', e);
+        console.error('Supabase createDocument error, falling back.', e);
       }
     }
 
@@ -591,13 +591,14 @@ export const db = {
   },
 
   async getDocumentById(id: string): Promise<DocumentData | null> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const d = await prisma.document.findUnique({ where: { id } });
-        if (d) return { ...d, uploadedAt: d.uploadedAt.toISOString() };
+        const { data, error } = await supabaseAdmin.from('documents').select('*').eq('id', id).maybeSingle();
+        if (error) throw error;
+        if (data) return toJsDocument(data);
         return null;
       } catch (e) {
-        console.error('Prisma getDocumentById error, falling back.', e);
+        console.error('Supabase getDocumentById error, falling back.', e);
       }
     }
     const dbData = readLocalDb();
@@ -612,22 +613,13 @@ export const db = {
       ...data
     };
 
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const r = await prisma.verificationReport.create({
-          data: {
-            id: newReport.id,
-            documentId: newReport.documentId,
-            category: newReport.category,
-            score: newReport.score,
-            flags: JSON.stringify(newReport.flags),
-            summary: newReport.summary,
-            analyzedAt: new Date(newReport.analyzedAt)
-          }
-        });
-        return { ...r, flags: JSON.parse(r.flags), analyzedAt: r.analyzedAt.toISOString() };
+        const { data: inserted, error } = await supabaseAdmin.from('verification_reports').insert(toDbReport(newReport)).select().single();
+        if (error) throw error;
+        return toJsReport(inserted);
       } catch (e) {
-        console.error('Prisma createReport error, falling back.', e);
+        console.error('Supabase createReport error, falling back.', e);
       }
     }
 
@@ -645,30 +637,40 @@ export const db = {
       ...data
     };
 
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const b = await prisma.trustBreakdown.upsert({
-          where: { candidateId: data.candidateId },
-          update: {
-            resumeScore: data.resumeScore,
-            certificateScore: data.certificateScore,
-            portfolioScore: data.portfolioScore,
-            finalScore: data.finalScore,
-            lastUpdated: new Date(newBreakdown.lastUpdated)
-          },
-          create: {
-            id: newBreakdown.id,
-            candidateId: data.candidateId,
-            resumeScore: data.resumeScore,
-            certificateScore: data.certificateScore,
-            portfolioScore: data.portfolioScore,
-            finalScore: data.finalScore,
-            lastUpdated: new Date(newBreakdown.lastUpdated)
-          }
-        });
-        return { ...b, lastUpdated: b.lastUpdated.toISOString() };
+        // Check existence
+        const { data: existing } = await supabaseAdmin.from('trust_breakdowns').select('id').eq('candidate_id', data.candidateId).maybeSingle();
+        
+        let upserted;
+        if (existing) {
+          const { data: updated, error } = await supabaseAdmin
+            .from('trust_breakdowns')
+            .update({
+              resume_score: data.resumeScore,
+              certificate_score: data.certificateScore,
+              portfolio_score: data.portfolioScore,
+              final_score: data.finalScore,
+              last_updated: newBreakdown.lastUpdated
+            })
+            .eq('candidate_id', data.candidateId)
+            .select()
+            .single();
+          if (error) throw error;
+          upserted = updated;
+        } else {
+          const { data: inserted, error } = await supabaseAdmin
+            .from('trust_breakdowns')
+            .insert(toDbBreakdown(newBreakdown))
+            .select()
+            .single();
+          if (error) throw error;
+          upserted = inserted;
+        }
+        
+        return toJsBreakdown(upserted);
       } catch (e) {
-        console.error('Prisma upsertTrustBreakdown error, falling back.', e);
+        console.error('Supabase upsertTrustBreakdown error, falling back.', e);
       }
     }
 
@@ -692,20 +694,13 @@ export const db = {
 
   // Audit Logs
   async getAuditLogs(): Promise<AuditLogData[]> {
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const logs = await prisma.auditLog.findMany({ orderBy: { timestamp: 'desc' } });
-        return logs.map((l: any) => ({
-          id: l.id,
-          actorId: l.actorId,
-          action: l.action,
-          targetId: l.targetId,
-          targetType: l.targetType,
-          timestamp: l.timestamp.toISOString(),
-          metadata: l.metadata || '{}'
-        }));
+        const { data, error } = await supabaseAdmin.from('audit_logs').select('*').order('timestamp', { ascending: false });
+        if (error) throw error;
+        return data.map(toJsAuditLog);
       } catch (e) {
-        console.error('Prisma getAuditLogs error, falling back.', e);
+        console.error('Supabase getAuditLogs error, falling back.', e);
       }
     }
     const dbData = readLocalDb();
@@ -719,30 +714,13 @@ export const db = {
       ...data
     };
 
-    if (usePrisma) {
+    if (useSupabase) {
       try {
-        const l = await prisma.auditLog.create({
-          data: {
-            id: newLog.id,
-            actorId: newLog.actorId,
-            action: newLog.action,
-            targetId: newLog.targetId,
-            targetType: newLog.targetType,
-            timestamp: new Date(newLog.timestamp),
-            metadata: newLog.metadata
-          }
-        });
-        return {
-          id: l.id,
-          actorId: l.actorId,
-          action: l.action,
-          targetId: l.targetId,
-          targetType: l.targetType,
-          timestamp: l.timestamp.toISOString(),
-          metadata: l.metadata || '{}'
-        };
+        const { data: inserted, error } = await supabaseAdmin.from('audit_logs').insert(toDbAuditLog(newLog)).select().single();
+        if (error) throw error;
+        return toJsAuditLog(inserted);
       } catch (e) {
-        console.error('Prisma createAuditLog error, falling back.', e);
+        console.error('Supabase createAuditLog error, falling back.', e);
       }
     }
 

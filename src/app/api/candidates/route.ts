@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
         const q = query.toLowerCase();
         const nameMatch = c.fullName.toLowerCase().includes(q);
         const headlineMatch = (c.headline || '').toLowerCase().includes(q);
-        if (!nameMatch && !headlineMatch) return false;
+        const emailMatch = c.user && c.user.email && c.user.email.toLowerCase() === q;
+        if (!nameMatch && !headlineMatch && !emailMatch) return false;
       }
 
       // 2. Status

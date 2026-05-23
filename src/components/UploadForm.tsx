@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, FileText, Award, FolderGit, CheckCircle2, ChevronRight, ChevronLeft, Upload, Link2, FileCode, Check, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -15,6 +15,16 @@ export default function UploadForm() {
   const [headline, setHeadline] = useState('');
   const [email, setEmail] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+
+  // Prefill registered user details if they just registered
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const regName = localStorage.getItem('registeredName');
+      const regEmail = localStorage.getItem('registeredEmail');
+      if (regName) setFullName(regName);
+      if (regEmail) setEmail(regEmail);
+    }
+  }, []);
 
   // Files State
   const [resume, setResume] = useState<File | null>(null);

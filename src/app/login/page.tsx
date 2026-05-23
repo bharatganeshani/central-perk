@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Shield, Lock, Mail, RefreshCw, Key } from 'lucide-react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,14 +20,37 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    // In a full NextAuth setup, we would call:
-    // const res = await signIn('credentials', { email, password, redirect: false })
-    // For local dev sandbox convenience, we simulate validation:
     try {
-      // Find candidatePortalId if candidate
+      // 1. Supabase Auth if credentials exist in env
+      const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+      
+      if (hasSupabase) {
+        const { data, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (authError) throw authError;
+        
+        console.log('Supabase authenticated user:', data.user);
+      }
+
+      // 2. Sandbox route logic based on selected role
       if (role === 'CANDIDATE') {
-        localStorage.setItem('candidatePortalId', 'candidate-2'); // default
-        router.push('/candidate/dashboard');
+        try {
+          const res = await fetch(`/api/candidates?query=${encodeURIComponent(email)}`);
+          const candData = await res.json();
+          if (candData.success && candData.candidates && candData.candidates.length > 0) {
+            const candId = candData.candidates[0].id;
+            localStorage.setItem('candidatePortalId', candId);
+            router.push('/candidate/dashboard');
+          } else {
+            localStorage.setItem('registeredEmail', email);
+            router.push('/candidate/upload');
+          }
+        } catch (e) {
+          localStorage.setItem('candidatePortalId', 'candidate-2'); // fallback default
+          router.push('/candidate/dashboard');
+        }
       } else if (role === 'RECRUITER') {
         router.push('/recruiter/dashboard');
       } else if (role === 'ADMIN') {
@@ -34,6 +58,7 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       setError(err.message || 'Authentication tunnel failed.');
+    } finally {
       setLoading(false);
     }
   };

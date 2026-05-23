@@ -1,5 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { supabaseAdmin } from '@/lib/supabase';
+
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function uploadToSupabase(file: File, candidateId: string): Promise<string> {
+  const bucketName = 'central-perk-uploads';
+  const filePath = `${candidateId}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+
+  try {
+    // 1. Check/Create Bucket
+    const { error: bucketError } = await supabaseAdmin.storage.getBucket(bucketName);
+    if (bucketError) {
+      console.log(`Bucket ${bucketName} not found, creating...`);
+      await supabaseAdmin.storage.createBucket(bucketName, { public: true });
+    }
+
+    // 2. Convert to ArrayBuffer -> Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayBuffer);
+
+    // 3. Upload File
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from(bucketName)
+      .upload(filePath, fileBuffer, {
+        contentType: file.type,
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.error('Supabase upload error details:', uploadError);
+      throw uploadError;
+    }
+
+    // 4. Return Public URL
+    const { data: urlData } = supabaseAdmin.storage.from(bucketName).getPublicUrl(filePath);
+    return urlData.publicUrl;
+  } catch (err) {
+    console.error('Failed to upload file to Supabase storage, using mock path:', err);
+    return `/uploads/${file.name}`;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,16 +84,20 @@ export async function POST(req: NextRequest) {
 
     // 3. Process Resume
     if (resumeFile && resumeFile.size > 0) {
-      // Validate size < 10MB
       if (resumeFile.size > 10 * 1024 * 1024) {
         return NextResponse.json({ success: false, error: 'Resume file exceeds 10MB limit.' }, { status: 400 });
+      }
+
+      let fileUrl = `/uploads/${resumeFile.name}`;
+      if (useSupabase) {
+        fileUrl = await uploadToSupabase(resumeFile, candidate.id);
       }
       
       const doc = await db.createDocument({
         candidateId: candidate.id,
         type: 'RESUME',
         fileName: resumeFile.name,
-        fileUrl: `/uploads/${resumeFile.name}` // local storage mock path
+        fileUrl
       });
       documentIds.push(doc.id);
     }
@@ -63,11 +108,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: false, error: 'Certificate file exceeds 10MB limit.' }, { status: 400 });
       }
 
+      let fileUrl = `/uploads/${certificateFile.name}`;
+      if (useSupabase) {
+        fileUrl = await uploadToSupabase(certificateFile, candidate.id);
+      }
+
       const doc = await db.createDocument({
         candidateId: candidate.id,
         type: 'CERTIFICATE',
         fileName: certificateFile.name,
-        fileUrl: `/uploads/${certificateFile.name}`
+        fileUrl
       });
       documentIds.push(doc.id);
     }
@@ -78,11 +128,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: false, error: 'Portfolio file exceeds 10MB limit.' }, { status: 400 });
       }
 
+      let fileUrl = `/uploads/${portfolioFile.name}`;
+      if (useSupabase) {
+        fileUrl = await uploadToSupabase(portfolioFile, candidate.id);
+      }
+
       const doc = await db.createDocument({
         candidateId: candidate.id,
         type: 'PORTFOLIO',
         fileName: portfolioFile.name,
-        fileUrl: `/uploads/${portfolioFile.name}`
+        fileUrl
       });
       documentIds.push(doc.id);
     } else if (portfolioUrl) {

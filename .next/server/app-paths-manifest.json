@@ -1,10 +1,22 @@
 {
-  "/page": "app/page.js",
-  "/api/candidates/[id]/route": "app/api/candidates/[id]/route.js",
-  "/candidate/upload/page": "app/candidate/upload/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/candidates/[id]/report/pdf/route": "app/api/candidates/[id]/report/pdf/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/audit-logs/route": "app/api/audit-logs/route.js",
-  "/candidate/dashboard/page": "app/candidate/dashboard/page.js",
+  "/api/candidates/[id]/route": "app/api/candidates/[id]/route.js",
+  "/admin/audit-logs/page": "app/admin/audit-logs/page.js",
+  "/api/reset/route": "app/api/reset/route.js",
+  "/api/register/route": "app/api/register/route.js",
+  "/api/trust-score/[candidateId]/route": "app/api/trust-score/[candidateId]/route.js",
   "/api/candidates/route": "app/api/candidates/route.js",
+  "/api/trust-score/calculate/route": "app/api/trust-score/calculate/route.js",
+  "/api/upload/route": "app/api/upload/route.js",
+  "/candidate/upload/page": "app/candidate/upload/page.js",
+  "/page": "app/page.js",
+  "/login/page": "app/login/page.js",
+  "/candidate/dashboard/page": "app/candidate/dashboard/page.js",
+  "/recruiter/analytics/page": "app/recruiter/analytics/page.js",
+  "/register/page": "app/register/page.js",
   "/recruiter/dashboard/page": "app/recruiter/dashboard/page.js",
-  "/admin/audit-logs/page": "app/admin/audit-logs/page.js"
+  "/recruiter/candidates/[id]/page": "app/recruiter/candidates/[id]/page.js"
 }

@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { Shield, Lock, Mail, User, ShieldCheck } from 'lucide-react';
+import { Shield, Lock, Mail, User, ShieldCheck, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,15 +18,53 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(false);
+    setLoading(true);
     setError('');
 
-    // In a full NextAuth setup, we would POST to an API route like /api/register
-    // For sandbox, we simulate:
-    if (role === 'CANDIDATE') {
-      router.push('/candidate/upload');
-    } else {
-      router.push('/recruiter/dashboard');
+    try {
+      const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+      // 1. Supabase Auth if credentials exist in env
+      if (hasSupabase) {
+        const { data, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              role
+            }
+          }
+        });
+        if (authError) throw authError;
+        console.log('Supabase registered user:', data.user);
+      }
+
+      // 2. Insert into custom DB (Supabase or local JSON mock DB)
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, role, password })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Database registration failed.');
+      }
+
+      // 3. Store name and email for candidate auto-fill upload
+      localStorage.setItem('registeredName', name);
+      localStorage.setItem('registeredEmail', email);
+
+      // 4. Redirect based on role
+      if (role === 'CANDIDATE') {
+        router.push('/candidate/upload');
+      } else {
+        router.push('/recruiter/dashboard');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Registration tunnel failed.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,8 +181,14 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full flex items-center justify-center space-x-2 py-3 bg-primary text-slate-950 font-bold rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50 mt-2"
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>REQUEST ENTRY KEY</span>
+              {loading ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>REQUEST ENTRY KEY</span>
+                </>
+              )}
             </button>
           </form>
         </div>
