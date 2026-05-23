@@ -5547,4 +5547,113 @@
       "targetType": "CANDIDATE",
       "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:42.861Z\"}"
     },
-    
+    {
+      "id": "4e1c9b74-364e-42cb-8dda-5ca7afda52d9",
+      "timestamp": "2026-05-23T17:42:45.781Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:45.781Z\"}"
+    },
+    {
+      "id": "adb47d5a-6d35-4da6-9dbc-5f9afe878307",
+      "timestamp": "2026-05-23T17:42:45.802Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:45.802Z\"}"
+    },
+    {
+      "id": "17400798-bf55-49f9-80b4-c1c8733395f9",
+      "timestamp": "2026-05-23T17:42:48.787Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:48.787Z\"}"
+    },
+    {
+      "id": "2e9106aa-b33d-4d81-b621-cb6e3ae17c0c",
+      "timestamp": "2026-05-23T17:42:48.816Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:48.815Z\"}"
+    },
+    {
+      "id": "3e9ea726-2c93-45ee-b652-1e9f20acb6c3",
+      "timestamp": "2026-05-23T17:42:51.775Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:51.775Z\"}"
+    },
+    {
+      "id": "fbc44430-25a9-4804-8085-e0379a123d51",
+      "timestamp": "2026-05-23T17:42:51.801Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:51.801Z\"}"
+    },
+    {
+      "id": "3d8507b6-8bf1-4736-9a1e-8791577d7600",
+      "timestamp": "2026-05-23T17:42:54.802Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:54.802Z\"}"
+    },
+    {
+      "id": "2f9c72f5-5c95-41b1-bb90-94951f5bec69",
+      "timestamp": "2026-05-23T17:42:54.845Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:54.845Z\"}"
+    },
+    {
+      "id": "eb2eeb3b-2170-4ada-94c5-ce5e2912278a",
+      "timestamp": "2026-05-23T17:42:57.782Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:57.782Z\"}"
+    },
+    {
+      "id": "66572743-d478-4b46-93c1-955a46a154a7",
+      "timestamp": "2026-05-23T17:42:57.803Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:42:57.803Z\"}"
+    },
+    {
+      "id": "5fd91ead-fce7-4ab0-a0d1-2d3b8ae15998",
+      "timestamp": "2026-05-23T17:43:00.794Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:43:00.794Z\"}"
+    },
+    {
+      "id": "2650c9f7-e218-4da0-97ed-88f6904f4e02",
+      "timestamp": "2026-05-23T17:43:00.849Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:43:00.849Z\"}"
+    }
+  ]
+}
