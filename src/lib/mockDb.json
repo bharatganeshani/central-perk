@@ -4655,6 +4655,303 @@
       "targetId": "b1aa8c90-7822-4649-b0cb-c91269d10116",
       "targetType": "CANDIDATE",
       "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T16:30:24.870Z\"}"
+    },
+    {
+      "id": "ad05d504-71b4-4fd8-9db3-302823eb964d",
+      "timestamp": "2026-05-23T17:40:21.319Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:21.316Z\"}"
+    },
+    {
+      "id": "feb882db-3fca-453f-baa6-a9b13edfb776",
+      "timestamp": "2026-05-23T17:40:21.428Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:21.427Z\"}"
+    },
+    {
+      "id": "7075ead6-de66-4972-9e1e-01e91b625d1b",
+      "timestamp": "2026-05-23T17:40:21.488Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:21.488Z\"}"
+    },
+    {
+      "id": "101e543e-d6da-487c-871d-3a041dbb5eba",
+      "timestamp": "2026-05-23T17:40:23.662Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:23.662Z\"}"
+    },
+    {
+      "id": "62f5b7ec-3fee-4bbf-9a1d-0a7410ef0e54",
+      "timestamp": "2026-05-23T17:40:23.721Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:23.721Z\"}"
+    },
+    {
+      "id": "c2657534-f36b-436f-9628-78bc6ea4ac5d",
+      "timestamp": "2026-05-23T17:40:26.189Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:26.189Z\"}"
+    },
+    {
+      "id": "602de5ee-4b47-4418-a7e6-6f0bd6bab745",
+      "timestamp": "2026-05-23T17:40:26.251Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:26.251Z\"}"
+    },
+    {
+      "id": "ceea7c7d-1b70-486b-8891-afb2dad55273",
+      "timestamp": "2026-05-23T17:40:28.693Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:28.693Z\"}"
+    },
+    {
+      "id": "33367483-7aad-43f4-a338-60229cca8f82",
+      "timestamp": "2026-05-23T17:40:28.736Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:28.736Z\"}"
+    },
+    {
+      "id": "50eed2d8-f1b7-424e-8291-05be0b41f883",
+      "timestamp": "2026-05-23T17:40:31.198Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:31.198Z\"}"
+    },
+    {
+      "id": "962d7a24-5e43-449f-b9a9-3ac6907703bb",
+      "timestamp": "2026-05-23T17:40:31.226Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:31.226Z\"}"
+    },
+    {
+      "id": "1fadc07d-4460-40b9-8193-67419b97cb0e",
+      "timestamp": "2026-05-23T17:40:33.724Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:33.724Z\"}"
+    },
+    {
+      "id": "c453bc7e-a1fb-41fe-a38f-0578905397dd",
+      "timestamp": "2026-05-23T17:40:33.753Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:33.753Z\"}"
+    },
+    {
+      "id": "957f65e3-fcb3-4e6c-a5d9-a380b364a394",
+      "timestamp": "2026-05-23T17:40:36.810Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:36.810Z\"}"
+    },
+    {
+      "id": "fd8f5f46-d0d3-4a4a-8642-460f3ff3a8d0",
+      "timestamp": "2026-05-23T17:40:36.856Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:36.856Z\"}"
+    },
+    {
+      "id": "5db287d6-4305-41bc-9ff9-6a3e4af9b7dc",
+      "timestamp": "2026-05-23T17:40:39.812Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:39.812Z\"}"
+    },
+    {
+      "id": "99755aa8-a8c6-455e-b889-2ae1be29ed82",
+      "timestamp": "2026-05-23T17:40:39.864Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:39.864Z\"}"
+    },
+    {
+      "id": "9e49e65b-b0f3-44b8-8044-03157bfc115f",
+      "timestamp": "2026-05-23T17:40:42.789Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:42.789Z\"}"
+    },
+    {
+      "id": "40ac5baf-4ed3-49ed-bdf5-8298c60e97ab",
+      "timestamp": "2026-05-23T17:40:42.827Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:42.826Z\"}"
+    },
+    {
+      "id": "28b2d5b7-f026-4527-af76-a3cdfa5f61fc",
+      "timestamp": "2026-05-23T17:40:45.817Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:45.817Z\"}"
+    },
+    {
+      "id": "cfe25307-6b62-480a-a6b0-73dd67af46ef",
+      "timestamp": "2026-05-23T17:40:45.866Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:45.866Z\"}"
+    },
+    {
+      "id": "c01c261d-8155-42e2-afb8-1304e4dd8c38",
+      "timestamp": "2026-05-23T17:40:48.790Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:48.790Z\"}"
+    },
+    {
+      "id": "2060222d-d9c5-44a1-b0a5-30f094493cb4",
+      "timestamp": "2026-05-23T17:40:48.810Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:48.810Z\"}"
+    },
+    {
+      "id": "29c86d1c-3c7e-4ba5-aaaa-861fbf140cb1",
+      "timestamp": "2026-05-23T17:40:51.786Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:51.786Z\"}"
+    },
+    {
+      "id": "432449b3-d326-484f-ada6-34584ae15319",
+      "timestamp": "2026-05-23T17:40:51.810Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:51.810Z\"}"
+    },
+    {
+      "id": "0c3bb346-b613-49c9-92cc-7401f2463a5e",
+      "timestamp": "2026-05-23T17:40:54.787Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:54.787Z\"}"
+    },
+    {
+      "id": "427e22ef-d779-4a31-b491-2d5e18d2a653",
+      "timestamp": "2026-05-23T17:40:54.811Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:54.811Z\"}"
+    },
+    {
+      "id": "4ebe12a9-041b-4576-9ba3-1799eba3469a",
+      "timestamp": "2026-05-23T17:40:57.776Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:57.776Z\"}"
+    },
+    {
+      "id": "184fa88d-875a-4691-b01d-af050408ae4c",
+      "timestamp": "2026-05-23T17:40:57.801Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:40:57.801Z\"}"
+    },
+    {
+      "id": "054fca85-065d-4330-a324-066c2a2861b6",
+      "timestamp": "2026-05-23T17:41:00.786Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:41:00.786Z\"}"
+    },
+    {
+      "id": "56c2e9a7-6eb4-4920-a4c2-5619ce175540",
+      "timestamp": "2026-05-23T17:41:00.809Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:41:00.809Z\"}"
+    },
+    {
+      "id": "4b827c7e-e43e-422c-b965-6650dc373fa3",
+      "timestamp": "2026-05-23T17:41:03.788Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:41:03.788Z\"}"
+    },
+    {
+      "id": "15ea01e5-6e4d-4e92-b7ee-9f5dd0f604b5",
+      "timestamp": "2026-05-23T17:41:03.813Z",
+      "actorId": "user-recruiter-1",
+      "action": "VIEW_PROFILE",
+      "targetId": "candidate-2",
+      "targetType": "CANDIDATE",
+      "metadata": "{\"ip\":\"127.0.0.1\",\"timestamp\":\"2026-05-23T17:41:03.813Z\"}"
     }
   ]
 }
